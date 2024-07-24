@@ -9,6 +9,7 @@
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "InputActionValue.h"
+#include "Components/TagComponent.h"
 
 DEFINE_LOG_CATEGORY(LogTemplateCharacter);
 
@@ -17,20 +18,27 @@ DEFINE_LOG_CATEGORY(LogTemplateCharacter);
 
 ATagGameCharacter::ATagGameCharacter()
 {
+	bReplicates = true;
+
 	CameraBoom = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraBoom"));
 	CameraBoom->SetupAttachment(RootComponent);
 
 	FollowCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("FollowCamera"));
 	FollowCamera->SetupAttachment(CameraBoom, USpringArmComponent::SocketName); 
+
+	TagComponent = CreateDefaultSubobject<UTagComponent>(TEXT("TagComponent"));
 }
 
 void ATagGameCharacter::BeginPlay()
 {
 	Super::BeginPlay();
+
 }
 
 void ATagGameCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
+	Super::SetupPlayerInputComponent(PlayerInputComponent);
+
 	// Add Input Mapping Context
 	if (APlayerController* PlayerController = Cast<APlayerController>(GetController()))
 	{
@@ -54,6 +62,8 @@ void ATagGameCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 	{
 		UE_LOG(LogTemp, Error, TEXT("Failed to find an Enhanced Input component!"));
 	}
+
+	OnInputSetup.Broadcast();
 }
 
 void ATagGameCharacter::Move(const FInputActionValue& Value)

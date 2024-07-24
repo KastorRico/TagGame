@@ -7,16 +7,22 @@
 
 class USpringArmComponent;
 class UCameraComponent;
+class UTagComponent;
+
 class UInputMappingContext;
 class UInputAction;
 struct FInputActionValue;
 
 DECLARE_LOG_CATEGORY_EXTERN(LogTemplateCharacter, Log, All);
+DECLARE_MULTICAST_DELEGATE(FOnInputSetup);
 
 UCLASS(config=Game)
 class ATagGameCharacter : public ACharacter
 {
 	GENERATED_BODY()
+public:
+
+	FOnInputSetup OnInputSetup;
 
 protected:
 
@@ -25,6 +31,10 @@ protected:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera)
 	TObjectPtr<UCameraComponent> FollowCamera;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera)
+	TObjectPtr<UTagComponent> TagComponent;
+
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input)
 	TObjectPtr<UInputMappingContext> DefaultMappingContext;
@@ -57,5 +67,7 @@ public:
 	FORCEINLINE USpringArmComponent* GetCameraBoom() const { return CameraBoom; }
 
 	FORCEINLINE UCameraComponent* GetFollowCamera() const { return FollowCamera;}
+
+	FORCEINLINE UTagComponent* GetTagComponent() const { return TagComponent; }
 };
 

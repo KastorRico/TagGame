@@ -13,6 +13,13 @@ class ATagGameGameMode : public AGameModeBase
 
 public:
 	ATagGameGameMode();
+
+protected:
+
+	void BeginPlay() override;
+
+	virtual void OnPostLogin(AController* NewPlayer) override;
+
 };
 
 
