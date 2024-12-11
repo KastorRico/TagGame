@@ -7,6 +7,7 @@
 #include "GameFramework/PlayerState.h"
 #include "TagGameCharacter.h"
 #include "Components/TagComponent.h"
+#include "TaskSystem/TaskLogComponent.h"
 
 ATagGameGameMode::ATagGameGameMode()
 {
@@ -35,6 +36,33 @@ void ATagGameGameMode::BeginPlay()
 		TagComponent->SetIsChaser(true);
 	}
 
+	GiveTasks();
+}
+
+void ATagGameGameMode::GiveTasks()
+{
+	if (Tasks.Num() == 0)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("EMPTY TASKS"));
+		return;
+	};
+	for(APlayerState* PlayerState:GameState->PlayerArray)
+	{
+		ATagGameCharacter* TagCharacter = Cast<ATagGameCharacter>(PlayerState->GetPawn());
+		if (TagCharacter == nullptr)
+		{
+			return;
+		}
+		UTaskLogComponent* TaskLogComponent =  TagCharacter->GetTaskLogComponent();
+		if(TaskLogComponent == nullptr)
+		{
+			return;
+		}
+		
+		int32 RandomTaskID = FMath::RandRange(0, Tasks.Num()-1);
+
+		TaskLogComponent->AddNewTask(Tasks[RandomTaskID].RowName);
+	}
 }
 
 void ATagGameGameMode::OnPostLogin(AController* NewPlayer)

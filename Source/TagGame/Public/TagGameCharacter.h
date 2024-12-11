@@ -8,6 +8,7 @@
 class USpringArmComponent;
 class UCameraComponent;
 class UTagComponent;
+class UTaskLogComponent;
 
 class UInputMappingContext;
 class UInputAction;
@@ -32,8 +33,11 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera)
 	TObjectPtr<UCameraComponent> FollowCamera;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera)
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	TObjectPtr<UTagComponent> TagComponent;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	TObjectPtr<UTaskLogComponent> TaskLogComponent;
 
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input)
@@ -66,8 +70,10 @@ public:
 
 	FORCEINLINE USpringArmComponent* GetCameraBoom() const { return CameraBoom; }
 
-	FORCEINLINE UCameraComponent* GetFollowCamera() const { return FollowCamera;}
+	FORCEINLINE UCameraComponent* GetFollowCamera() const { return FollowCamera; }
 
 	FORCEINLINE UTagComponent* GetTagComponent() const { return TagComponent; }
+
+	FORCEINLINE UTaskLogComponent* GetTaskLogComponent() const { return TaskLogComponent; }
 };
 

@@ -18,7 +18,12 @@ protected:
 
 	void BeginPlay() override;
 
+	void GiveTasks();
+
 	virtual void OnPostLogin(AController* NewPlayer) override;
+
+	UPROPERTY(EditDefaultsOnly,meta = (DataTable = "/Game/DT_TaskDetails"))
+	TArray<FDataTableRowHandle> Tasks;
 
 };
 

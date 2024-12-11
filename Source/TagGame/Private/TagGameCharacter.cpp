@@ -10,6 +10,7 @@
 #include "EnhancedInputSubsystems.h"
 #include "InputActionValue.h"
 #include "Components/TagComponent.h"
+#include "TaskSystem/TaskLogComponent.h"
 
 DEFINE_LOG_CATEGORY(LogTemplateCharacter);
 
@@ -27,6 +28,8 @@ ATagGameCharacter::ATagGameCharacter()
 	FollowCamera->SetupAttachment(CameraBoom, USpringArmComponent::SocketName); 
 
 	TagComponent = CreateDefaultSubobject<UTagComponent>(TEXT("TagComponent"));
+
+	TaskLogComponent = CreateDefaultSubobject<UTaskLogComponent>(TEXT("TaskLogComponent"));
 }
 
 void ATagGameCharacter::BeginPlay()
