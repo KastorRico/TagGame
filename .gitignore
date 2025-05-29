@@ -2,6 +2,10 @@
 .vs/
 .vsconfig
 
+# JetBrains Rider Generated Files #
+# Cache Directory
+.idea
+
 # Compiled Object files
 *.slo
 *.lo
