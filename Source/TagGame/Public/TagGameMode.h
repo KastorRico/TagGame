@@ -3,20 +3,19 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "GameFramework/GameModeBase.h"
-#include "TagGameGameMode.generated.h"
+#include "GameFramework/GameMode.h"
+#include "TagGameMode.generated.h"
 
 UCLASS(minimalapi)
-class ATagGameGameMode : public AGameModeBase
+class ATagGameMode : public AGameModeBase
 {
 	GENERATED_BODY()
 
 public:
-	ATagGameGameMode();
+	ATagGameMode();
 
 protected:
-
-	void BeginPlay() override;
+	virtual void BeginPlay() override;
 
 	void GiveTasks();
 
@@ -24,6 +23,7 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly,meta = (DataTable = "/Game/DT_TaskDetails"))
 	TArray<FDataTableRowHandle> Tasks;
+	
 
 };
 

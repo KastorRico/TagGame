@@ -11,6 +11,7 @@
 #include "InputActionValue.h"
 #include "Components/TagComponent.h"
 #include "TaskSystem/TaskLogComponent.h"
+#include "TaskSystem/InteractionInterface.h"
 
 DEFINE_LOG_CATEGORY(LogTemplateCharacter);
 
@@ -38,6 +39,13 @@ void ATagGameCharacter::BeginPlay()
 
 }
 
+void ATagGameCharacter::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+
+	InteractTrace();
+}
+
 void ATagGameCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
@@ -60,6 +68,8 @@ void ATagGameCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 		EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &ATagGameCharacter::Move);
 
 		EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &ATagGameCharacter::Look);
+
+		EnhancedInputComponent->BindAction(InteractAction,ETriggerEvent::Started,this,&ATagGameCharacter::Interact);
 	}
 	else
 	{
@@ -103,4 +113,57 @@ void ATagGameCharacter::Look(const FInputActionValue& Value)
 		AddControllerYawInput(LookAxisVector.X);
 		AddControllerPitchInput(LookAxisVector.Y);
 	}
+}
+
+void ATagGameCharacter::InteractTrace()
+{
+	const FVector Start = GetActorLocation();
+	const FVector End = Start + GetActorForwardVector() * InteractTraceLength;
+	//DrawDebugLine(GetWorld(),Start,End,FColor::Red,true);
+
+	FCollisionObjectQueryParams CollisionObjectQueryParams;
+	CollisionObjectQueryParams.AddObjectTypesToQuery(ECC_Pawn);
+	FCollisionQueryParams CollisionQueryParams;
+	CollisionQueryParams.AddIgnoredActor(this);
+
+	FHitResult HitResult;
+	GetWorld()->SweepSingleByObjectType(HitResult,
+	                                    Start,End,FQuat(),CollisionObjectQueryParams,
+	                                    FCollisionShape::MakeSphere(InteractTraceRadius),
+	                                    CollisionQueryParams);
+
+	if (!HitResult.bBlockingHit)
+	{
+		LookAtActor = nullptr;
+		return ;
+	}
+
+	LookAtActor = HitResult.GetActor();
+	if (IInteractionInterface* InteractableActor = Cast<IInteractionInterface>(HitResult.GetActor()))
+	{
+		InteractableActor->LookAt();
+	}
+}
+
+void ATagGameCharacter::Interact()
+{
+	if (LookAtActor == nullptr)
+	{
+		return;
+	}
+	
+	if (IInteractionInterface* InteractableActor = Cast<IInteractionInterface>(LookAtActor))
+	{
+		InteractableActor->Interact();
+		return;
+	}
+	
+	if (ATagGameCharacter* HitCharacter = Cast<ATagGameCharacter>(LookAtActor))
+	{
+		if (TagComponent != nullptr && TagComponent->IsChaser())
+		{
+			TagComponent->Tag(HitCharacter);
+		}
+	}
+	
 }

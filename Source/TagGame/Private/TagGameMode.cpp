@@ -1,15 +1,15 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
-#include "TagGameGameMode.h"
+#include "TagGameMode.h"
 #include "TagGameCharacter.h"
 #include "UObject/ConstructorHelpers.h"
 #include "GameFramework/GameStateBase.h"
 #include "GameFramework/PlayerState.h"
-#include "TagGameCharacter.h"
 #include "Components/TagComponent.h"
 #include "TaskSystem/TaskLogComponent.h"
 
-ATagGameGameMode::ATagGameGameMode()
+DEFINE_LOG_CATEGORY_STATIC(LogTagGameMode,Log,All)
+ATagGameMode::ATagGameMode()
 {
 	// set default pawn class to our Blueprinted character
 	static ConstructorHelpers::FClassFinder<APawn> PlayerPawnBPClass(TEXT("/Game/ThirdPerson/Blueprints/BP_ThirdPersonCharacter"));
@@ -19,11 +19,11 @@ ATagGameGameMode::ATagGameGameMode()
 	}
 }
 
-void ATagGameGameMode::BeginPlay()
+void ATagGameMode::BeginPlay()
 {
 	Super::BeginPlay();
-
-	int32 RandomPlayerIndex = FMath::RandRange(0, GameState->PlayerArray.Num()-1);
+	
+	int32 RandomPlayerIndex = FMath::RandRange(0, 0);
 	APlayerState* RandomPlayerState = GameState->PlayerArray[RandomPlayerIndex];
 	ATagGameCharacter* TagCharacter = Cast<ATagGameCharacter>(RandomPlayerState->GetPawn());
 	if (TagCharacter == nullptr)
@@ -39,11 +39,11 @@ void ATagGameGameMode::BeginPlay()
 	GiveTasks();
 }
 
-void ATagGameGameMode::GiveTasks()
+void ATagGameMode::GiveTasks()
 {
 	if (Tasks.Num() == 0)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("EMPTY TASKS"));
+		UE_LOG(LogTagGameMode, Warning, TEXT("EMPTY TASKS"));
 		return;
 	};
 	for(APlayerState* PlayerState:GameState->PlayerArray)
@@ -65,8 +65,9 @@ void ATagGameGameMode::GiveTasks()
 	}
 }
 
-void ATagGameGameMode::OnPostLogin(AController* NewPlayer)
+void ATagGameMode::OnPostLogin(AController* NewPlayer)
 {
 	Super::OnPostLogin(NewPlayer);
+	
 }
 

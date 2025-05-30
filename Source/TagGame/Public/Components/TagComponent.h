@@ -1,5 +1,3 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
 #pragma once
 
 #include "CoreMinimal.h"
@@ -21,35 +19,19 @@ public:
 
 protected:
 
-	virtual void BeginPlay() override;
-
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
-
-	UFUNCTION()
-	virtual void Tag();
-
-	UFUNCTION()
-	virtual void SetupInput();
-
-	UPROPERTY(EditAnywhere)
-	float TagTraceLength = 50.f;
-
-	UPROPERTY(EditAnywhere)
-	float TagTraceRadius = 25.f;
-
+	
 	UPROPERTY(Replicated,VisibleAnywhere)
 	bool bIsChaser = false;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input)
-	TObjectPtr<UInputAction> TagAction;
-
-	UPROPERTY(Transient)
-	ATagGameCharacter* OwnerCharacter;
+	UFUNCTION(Server, Unreliable, WithValidation)
+	void ServerTagCharacter(ATagGameCharacter* NewChaser);
 
 public:
 
-	UFUNCTION(Server, Reliable, WithValidation)
-	void ServerTagCharacter(ATagGameCharacter* NewChaser);
+	UFUNCTION()
+	void Tag(ATagGameCharacter* TaggedActor);
 
 	FORCEINLINE void SetIsChaser(bool Value) { bIsChaser = Value; }
+	FORCEINLINE bool IsChaser() const { return bIsChaser; }
 };

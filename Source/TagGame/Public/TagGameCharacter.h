@@ -44,13 +44,26 @@ protected:
 	TObjectPtr<UInputMappingContext> DefaultMappingContext;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input)
-	UInputAction* JumpAction;
+	TObjectPtr<UInputAction> JumpAction;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input)
 	TObjectPtr<UInputAction> MoveAction;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input)
 	TObjectPtr<UInputAction> LookAction;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input)
+	TObjectPtr<UInputAction> InteractAction;
+
+
+	UPROPERTY(EditAnywhere)
+	float InteractTraceLength = 50.f;
+
+	UPROPERTY(EditAnywhere)
+	float InteractTraceRadius = 25.f;
+
+	UPROPERTY(Transient)
+	TObjectPtr<AActor> LookAtActor;
 
 public:
 	ATagGameCharacter();
@@ -60,11 +73,16 @@ protected:
 	void Move(const FInputActionValue& Value);
 
 	void Look(const FInputActionValue& Value);
+	
+	void InteractTrace();
+	void Interact();
 			
 
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 	
 	virtual void BeginPlay();
+
+	virtual void Tick(float DeltaTime) override;
 
 public:
 
