@@ -5,8 +5,6 @@
 #include "TagComponent.generated.h"
 
 class ATagGameCharacter;
-class UInputAction;
-struct FInputActionValue;
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class TAGGAME_API UTagComponent : public UActorComponent
@@ -23,9 +21,6 @@ protected:
 	
 	UPROPERTY(Replicated,VisibleAnywhere)
 	bool bIsChaser = false;
-
-	UFUNCTION(Server, Unreliable, WithValidation)
-	void ServerTagCharacter(ATagGameCharacter* NewChaser);
 
 public:
 

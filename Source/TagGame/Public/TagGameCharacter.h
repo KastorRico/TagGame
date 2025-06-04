@@ -60,9 +60,9 @@ protected:
 	float InteractTraceLength = 50.f;
 
 	UPROPERTY(EditAnywhere)
-	float InteractTraceRadius = 25.f;
+	float InteractTraceRadius = 75.f;
 
-	UPROPERTY(Transient)
+	UPROPERTY(Transient,VisibleAnywhere)
 	TObjectPtr<AActor> LookAtActor;
 
 public:
@@ -76,6 +76,9 @@ protected:
 	
 	void InteractTrace();
 	void Interact();
+
+	UFUNCTION(Server, Unreliable)
+	void Server_Interact();
 			
 
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;

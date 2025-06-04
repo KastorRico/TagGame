@@ -25,5 +25,8 @@ public:
 	FString Interact();
 
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
-	bool LookAt();
+	void LookAt();
+
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
+	void StopLookAt();
 };

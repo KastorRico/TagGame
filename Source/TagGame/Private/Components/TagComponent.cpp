@@ -22,6 +22,7 @@ void UTagComponent::Tag(ATagGameCharacter* TaggedActor)
 {
 	if (!bIsChaser)
 	{
+		UE_LOG(LogTagComponent, Warning, TEXT("Character is not a chaser!"));
 		return;
 	}
 	if (TaggedActor == GetOwner())
@@ -30,28 +31,18 @@ void UTagComponent::Tag(ATagGameCharacter* TaggedActor)
 		return;
 	}
 	
-	ServerTagCharacter(TaggedActor);
-
-}
-
-void UTagComponent::ServerTagCharacter_Implementation(ATagGameCharacter* NewChaser)
-{
-	if (NewChaser == nullptr)
+	if (TaggedActor == nullptr)
 	{
 		UE_LOG(LogTagComponent, Warning, TEXT("Character is not valid!"));
 		return;
 	}
-	UTagComponent* TagComponent = NewChaser->GetTagComponent();
+	UTagComponent* TagComponent = TaggedActor->GetTagComponent();
 	if (TagComponent == nullptr)
 	{
 		return;
 	}
 	bIsChaser = false;
 	TagComponent->SetIsChaser(true);
-	UE_LOG(LogTagComponent, Warning, TEXT("%s is Tagged"), *NewChaser->GetName());
-}
+	UE_LOG(LogTagComponent, Warning, TEXT("%s is Tagged"), *TaggedActor->GetName());
 
-bool UTagComponent::ServerTagCharacter_Validate(ATagGameCharacter* NewChaser)
-{
-	return true;
 }

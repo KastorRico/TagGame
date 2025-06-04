@@ -119,42 +119,64 @@ void ATagGameCharacter::InteractTrace()
 {
 	const FVector Start = GetActorLocation();
 	const FVector End = Start + GetActorForwardVector() * InteractTraceLength;
-	//DrawDebugLine(GetWorld(),Start,End,FColor::Red,true);
-
-	FCollisionObjectQueryParams CollisionObjectQueryParams;
-	CollisionObjectQueryParams.AddObjectTypesToQuery(ECC_Pawn);
+	DrawDebugLine(GetWorld(),Start,End,FColor::Red,false,3.f);
+	
 	FCollisionQueryParams CollisionQueryParams;
 	CollisionQueryParams.AddIgnoredActor(this);
 
 	FHitResult HitResult;
-	GetWorld()->SweepSingleByObjectType(HitResult,
-	                                    Start,End,FQuat(),CollisionObjectQueryParams,
+	GetWorld()->SweepSingleByChannel(HitResult,
+	                                    Start,End,FQuat(),ECC_GameTraceChannel1,
 	                                    FCollisionShape::MakeSphere(InteractTraceRadius),
 	                                    CollisionQueryParams);
-
+	
+	
 	if (!HitResult.bBlockingHit)
 	{
+		if (Cast<IInteractionInterface>(LookAtActor) && IsLocallyControlled())
+		{
+			IInteractionInterface::Execute_StopLookAt(LookAtActor);
+		}
 		LookAtActor = nullptr;
 		return ;
 	}
-
-	LookAtActor = HitResult.GetActor();
-	if (IInteractionInterface* InteractableActor = Cast<IInteractionInterface>(HitResult.GetActor()))
+	
+	if (LookAtActor == HitResult.GetActor())
 	{
-		InteractableActor->LookAt();
+		return;
 	}
+	
+	if(IsLocallyControlled())
+	{
+		if (Cast<IInteractionInterface>(LookAtActor))
+		{
+			IInteractionInterface::Execute_StopLookAt(LookAtActor);
+		}
+		if (Cast<IInteractionInterface>(HitResult.GetActor()))
+		{
+			IInteractionInterface::Execute_LookAt(HitResult.GetActor());
+		}
+	}
+
+	
+	LookAtActor = HitResult.GetActor();
 }
 
 void ATagGameCharacter::Interact()
+{
+	Server_Interact();
+}
+
+void ATagGameCharacter::Server_Interact_Implementation()
 {
 	if (LookAtActor == nullptr)
 	{
 		return;
 	}
 	
-	if (IInteractionInterface* InteractableActor = Cast<IInteractionInterface>(LookAtActor))
+	if (Cast<IInteractionInterface>(LookAtActor))
 	{
-		InteractableActor->Interact();
+		IInteractionInterface::Execute_Interact(LookAtActor);
 		return;
 	}
 	
@@ -165,5 +187,4 @@ void ATagGameCharacter::Interact()
 			TagComponent->Tag(HitCharacter);
 		}
 	}
-	
 }
