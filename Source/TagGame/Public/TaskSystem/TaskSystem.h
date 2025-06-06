@@ -34,8 +34,6 @@ struct FObjectiveDetails
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	int32 Quantity;
-
-	bool bIsOptional = false;
 };
 
 USTRUCT(BlueprintType)

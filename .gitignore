@@ -40,6 +40,7 @@
 *.xcodeproj
 *.xcworkspace
 *.sln
+*.sln.DotSettings.user
 *.suo
 *.opensdf
 *.sdf
@@ -77,3 +78,4 @@ Plugins/*/Intermediate/*
 
 # Cache files for the editor to use
 DerivedDataCache/*
+

@@ -21,10 +21,12 @@ protected:
 
 	virtual void BeginPlay() override;
 
-	UPROPERTY(VisibleAnywhere)
+	virtual void GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const override;
+
+	UPROPERTY(VisibleAnywhere, Replicated)
 	TArray<TObjectPtr<ATaskBase>> CurrentTasks;
 
-	UPROPERTY(VisibleAnywhere)
+	UPROPERTY(VisibleAnywhere, Replicated, BlueprintGetter=GetCurrentActiveTasks)
 	TArray<FName> CurrentActiveTasks;
 
 	UPROPERTY(VisibleAnywhere)
@@ -33,10 +35,11 @@ protected:
 	UPROPERTY(VisibleAnywhere)
 	FName CurrentTask;
 
+	UPROPERTY(EditDefaultsOnly)
+	TSubclassOf<ATaskBase> TaskClass;
+
 public:	
-
-	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
-
+	
 	void AddNewTask(const FName& TaskID);
 
 	void CompleteTask();
@@ -44,4 +47,7 @@ public:
 	void TrackTask();
 
 	bool IsTaskActive(const FName& TaskID);
+
+	UFUNCTION(BlueprintPure)
+	FORCEINLINE TArray<FName> GetCurrentActiveTasks() const { return CurrentActiveTasks; }
 };

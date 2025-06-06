@@ -15,7 +15,7 @@ class UInputAction;
 struct FInputActionValue;
 
 DECLARE_LOG_CATEGORY_EXTERN(LogTemplateCharacter, Log, All);
-DECLARE_MULTICAST_DELEGATE(FOnInputSetup);
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnObjectiveIdCalled, const FString&);
 
 UCLASS(config=Game)
 class ATagGameCharacter : public ACharacter
@@ -23,7 +23,7 @@ class ATagGameCharacter : public ACharacter
 	GENERATED_BODY()
 public:
 
-	FOnInputSetup OnInputSetup;
+	FOnObjectiveIdCalled OnObjectiveIdCalled;
 
 protected:
 

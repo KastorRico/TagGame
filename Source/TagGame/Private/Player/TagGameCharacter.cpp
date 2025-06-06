@@ -1,9 +1,7 @@
-#include "TagGameCharacter.h"
+#include "Player/TagGameCharacter.h"
 
 #include "Engine/LocalPlayer.h"
 #include "Camera/CameraComponent.h"
-#include "Components/CapsuleComponent.h"
-#include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "GameFramework/Controller.h"
 #include "EnhancedInputComponent.h"
@@ -75,8 +73,7 @@ void ATagGameCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 	{
 		UE_LOG(LogTemp, Error, TEXT("Failed to find an Enhanced Input component!"));
 	}
-
-	OnInputSetup.Broadcast();
+	
 }
 
 void ATagGameCharacter::Move(const FInputActionValue& Value)
@@ -176,7 +173,11 @@ void ATagGameCharacter::Server_Interact_Implementation()
 	
 	if (Cast<IInteractionInterface>(LookAtActor))
 	{
-		IInteractionInterface::Execute_Interact(LookAtActor);
+		const FString& ObjectiveId = IInteractionInterface::Execute_Interact(LookAtActor);
+		if (OnObjectiveIdCalled.IsBound())
+		{
+			OnObjectiveIdCalled.Broadcast(ObjectiveId);
+		}
 		return;
 	}
 	

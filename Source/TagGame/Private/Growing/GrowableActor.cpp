@@ -87,7 +87,7 @@ FString AGrowableActor::Interact_Implementation()
 		return "";
 	}
 	Destroy();
-	return "";
+	return ObjectiveID;
 }
 
 void AGrowableActor::Grow()

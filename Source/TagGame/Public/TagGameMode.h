@@ -6,6 +6,8 @@
 #include "GameFramework/GameMode.h"
 #include "TagGameMode.generated.h"
 
+class ATagGameCharacter;
+
 UCLASS(minimalapi)
 class ATagGameMode : public AGameModeBase
 {
@@ -17,7 +19,10 @@ public:
 protected:
 	virtual void BeginPlay() override;
 
-	void GiveTasks();
+	void GiveTasks(ATagGameCharacter* TagCharacter);
+
+	UFUNCTION()
+	void GiveTasksToNewPawn(APawn* OldPawn, APawn* NewPawn);
 
 	virtual void OnPostLogin(AController* NewPlayer) override;
 

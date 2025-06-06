@@ -1,7 +1,7 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
 #include "TagGameMode.h"
-#include "TagGameCharacter.h"
+#include "Player/TagGameCharacter.h"
 #include "UObject/ConstructorHelpers.h"
 #include "GameFramework/GameStateBase.h"
 #include "GameFramework/PlayerState.h"
@@ -11,12 +11,7 @@
 DEFINE_LOG_CATEGORY_STATIC(LogTagGameMode,Log,All)
 ATagGameMode::ATagGameMode()
 {
-	// set default pawn class to our Blueprinted character
-	static ConstructorHelpers::FClassFinder<APawn> PlayerPawnBPClass(TEXT("/Game/ThirdPerson/Blueprints/BP_ThirdPersonCharacter"));
-	if (PlayerPawnBPClass.Class != NULL)
-	{
-		DefaultPawnClass = PlayerPawnBPClass.Class;
-	}
+
 }
 
 void ATagGameMode::BeginPlay()
@@ -28,6 +23,7 @@ void ATagGameMode::BeginPlay()
 	ATagGameCharacter* TagCharacter = Cast<ATagGameCharacter>(RandomPlayerState->GetPawn());
 	if (TagCharacter == nullptr)
 	{
+		UE_LOG(LogTagGameMode,Error,TEXT("Attempting to get a null Pawn"));
 		return;
 	}
 
@@ -35,33 +31,38 @@ void ATagGameMode::BeginPlay()
 	{
 		TagComponent->SetIsChaser(true);
 	}
-
-	GiveTasks();
 }
 
-void ATagGameMode::GiveTasks()
+void ATagGameMode::GiveTasks(ATagGameCharacter* TagCharacter)
 {
-	if (Tasks.Num() == 0)
+	if (TagCharacter == nullptr)
 	{
-		UE_LOG(LogTagGameMode, Warning, TEXT("EMPTY TASKS"));
+		UE_LOG(LogTagGameMode,Warning,TEXT("Character is not valid!"));
 		return;
-	};
-	for(APlayerState* PlayerState:GameState->PlayerArray)
+	}
+	
+	UTaskLogComponent* TaskLogComponent = TagCharacter->GetTaskLogComponent();
+	if(TaskLogComponent == nullptr)
 	{
-		ATagGameCharacter* TagCharacter = Cast<ATagGameCharacter>(PlayerState->GetPawn());
-		if (TagCharacter == nullptr)
-		{
-			return;
-		}
-		UTaskLogComponent* TaskLogComponent =  TagCharacter->GetTaskLogComponent();
-		if(TaskLogComponent == nullptr)
-		{
-			return;
-		}
-		
-		int32 RandomTaskID = FMath::RandRange(0, Tasks.Num()-1);
+		UE_LOG(LogTagGameMode,Error,TEXT("TaskLogComponent is not valid!"));
+		return;
+	}
+	
+	int32 RandomTaskID = FMath::RandRange(0, Tasks.Num()-1);
 
-		TaskLogComponent->AddNewTask(Tasks[RandomTaskID].RowName);
+	TaskLogComponent->AddNewTask(Tasks[RandomTaskID].RowName);
+}
+
+void ATagGameMode::GiveTasksToNewPawn(APawn* OldPawn, APawn* NewPawn)
+{
+	if (NewPawn == nullptr)
+	{
+		return;
+	}
+
+	if (ATagGameCharacter* ATagCharacter = Cast<ATagGameCharacter>(NewPawn))
+	{
+		GiveTasks(ATagCharacter);
 	}
 }
 
@@ -69,5 +70,6 @@ void ATagGameMode::OnPostLogin(AController* NewPlayer)
 {
 	Super::OnPostLogin(NewPlayer);
 	
+	NewPlayer->OnPossessedPawnChanged.AddUniqueDynamic(this,&ATagGameMode::GiveTasksToNewPawn);
 }
 

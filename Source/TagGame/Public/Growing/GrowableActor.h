@@ -52,6 +52,9 @@ protected:
 	UPROPERTY(EditDefaultsOnly)
 	float TimeToSwitchStage = 1.0f;
 
+	UPROPERTY(EditDefaultsOnly)
+	FString ObjectiveID = "Collecting";
+
 	FTimerHandle GrowingTimer;
 	
 	bool bIsReadyToCollect = false;

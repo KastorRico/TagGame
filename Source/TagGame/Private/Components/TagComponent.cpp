@@ -1,6 +1,6 @@
 #include "Components/TagComponent.h"
 
-#include "TagGameCharacter.h"
+#include "Player/TagGameCharacter.h"
 #include "Net/UnrealNetwork.h"
 
 DEFINE_LOG_CATEGORY_STATIC(LogTagComponent,Log,All)

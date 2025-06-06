@@ -3,16 +3,16 @@
 
 #include "TaskSystem/TaskLogComponent.h"
 
+#include "Net/UnrealNetwork.h"
 #include "TaskSystem/TaskBase.h"
 
-// Sets default values for this component's properties
+DEFINE_LOG_CATEGORY_STATIC(LogTaskLogComponent,Log,All)
+
 UTaskLogComponent::UTaskLogComponent()
 {
-	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
-	// off to improve performance if you don't need them.
-	PrimaryComponentTick.bCanEverTick = true;
+	PrimaryComponentTick.bCanEverTick = false;
 
-	// ...
+	SetIsReplicatedByDefault(true);
 }
 
 
@@ -21,17 +21,14 @@ void UTaskLogComponent::BeginPlay()
 {
 	Super::BeginPlay();
 
-	// ...
-	
 }
 
-
-// Called every frame
-void UTaskLogComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
+void UTaskLogComponent::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const
 {
-	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
-	// ...
+	DOREPLIFETIME(UTaskLogComponent, CurrentTasks);
+	DOREPLIFETIME(UTaskLogComponent, CurrentActiveTasks);
 }
 
 void UTaskLogComponent::AddNewTask(const FName& TaskID)
@@ -41,8 +38,14 @@ void UTaskLogComponent::AddNewTask(const FName& TaskID)
 		return;
 	}
 
+	if (TaskClass == nullptr)
+	{
+		UE_LOG(LogTaskLogComponent, Warning,TEXT("No Task class is set!"))
+		return;
+	}
+	
 	CurrentActiveTasks.Add(TaskID);
-	if (ATaskBase* Task = GetWorld()->SpawnActor<ATaskBase>())
+	if (ATaskBase* Task = GetWorld()->SpawnActor<ATaskBase>(TaskClass))
 	{
 		Task->SetTaskID(TaskID);
 		CurrentTasks.Add(Task);
