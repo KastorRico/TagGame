@@ -6,6 +6,7 @@
 #include "Components/ActorComponent.h"
 #include "TaskLogComponent.generated.h"
 
+
 class ATaskBase;
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
@@ -18,12 +19,13 @@ public:
 	UTaskLogComponent();
 
 protected:
-
-	virtual void BeginPlay() override;
-
+	
 	virtual void GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const override;
 
-	UPROPERTY(VisibleAnywhere, Replicated)
+	UFUNCTION(Client, Reliable)
+	void Client_SpawnTask(const FName& TaskID);
+	
+	UPROPERTY(VisibleAnywhere, BlueprintGetter=GetCurrentTasks)
 	TArray<TObjectPtr<ATaskBase>> CurrentTasks;
 
 	UPROPERTY(VisibleAnywhere, Replicated, BlueprintGetter=GetCurrentActiveTasks)
@@ -50,4 +52,7 @@ public:
 
 	UFUNCTION(BlueprintPure)
 	FORCEINLINE TArray<FName> GetCurrentActiveTasks() const { return CurrentActiveTasks; }
+
+	UFUNCTION(BlueprintPure)
+	FORCEINLINE TArray<ATaskBase*> GetCurrentTasks() const {return CurrentTasks;}
 };

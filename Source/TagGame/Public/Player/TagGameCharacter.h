@@ -79,11 +79,13 @@ protected:
 
 	UFUNCTION(Server, Unreliable)
 	void Server_Interact();
-			
 
+	UFUNCTION(Client, Unreliable)
+	void Client_BroadcastObjectiveIdCalled(const FString& ObjectiveId);
+	
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 	
-	virtual void BeginPlay();
+	virtual void BeginPlay() override;
 
 	virtual void Tick(float DeltaTime) override;
 

@@ -161,22 +161,21 @@ void ATagGameCharacter::InteractTrace()
 
 void ATagGameCharacter::Interact()
 {
+	if (LookAtActor == nullptr)
+	{
+		return;
+	}
 	Server_Interact();
 }
 
 void ATagGameCharacter::Server_Interact_Implementation()
 {
-	if (LookAtActor == nullptr)
-	{
-		return;
-	}
-	
 	if (Cast<IInteractionInterface>(LookAtActor))
 	{
 		const FString& ObjectiveId = IInteractionInterface::Execute_Interact(LookAtActor);
-		if (OnObjectiveIdCalled.IsBound())
+		if (!ObjectiveId.IsEmpty())
 		{
-			OnObjectiveIdCalled.Broadcast(ObjectiveId);
+			Client_BroadcastObjectiveIdCalled(ObjectiveId);	
 		}
 		return;
 	}
@@ -188,4 +187,9 @@ void ATagGameCharacter::Server_Interact_Implementation()
 			TagComponent->Tag(HitCharacter);
 		}
 	}
+}
+
+void ATagGameCharacter::Client_BroadcastObjectiveIdCalled_Implementation(const FString& ObjectiveId)
+{
+	OnObjectiveIdCalled.Broadcast(ObjectiveId);	
 }

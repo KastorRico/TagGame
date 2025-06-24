@@ -2,14 +2,14 @@
 
 #include "Player/TagGameCharacter.h"
 #include "Kismet/GameplayStatics.h"
+#include "Net/UnrealNetwork.h"
 
-DEFINE_LOG_CATEGORY_STATIC(LogTaskBase,Log,All)
+DEFINE_LOG_CATEGORY_STATIC(LogTaskBase, Log, All)
 
 ATaskBase::ATaskBase()
 {
 	PrimaryActorTick.bCanEverTick = false;
 }
-
 
 void ATaskBase::BeginPlay()
 {
@@ -59,12 +59,12 @@ FObjectiveDetails ATaskBase::GetObjectiveDetails(const FString& ObjectiveID)
 
 void ATaskBase::OnObjectiveIdHeard(const FString& ObjectiveId)
 {
-	
-	if (CurrObjectiveID ==  ObjectiveId)
+	if (CurrObjectiveID == ObjectiveId)
 	{
 		if (ObjectiveProgress < GetObjectiveDetails(ObjectiveId).Quantity)
 		{
 			ObjectiveProgress++;
+			OnObjectiveProgressChanged.Broadcast();
 		}
 	}
 }

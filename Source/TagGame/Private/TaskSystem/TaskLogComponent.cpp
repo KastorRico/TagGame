@@ -1,6 +1,3 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
-
 #include "TaskSystem/TaskLogComponent.h"
 
 #include "Net/UnrealNetwork.h"
@@ -15,20 +12,26 @@ UTaskLogComponent::UTaskLogComponent()
 	SetIsReplicatedByDefault(true);
 }
 
-
-// Called when the game starts
-void UTaskLogComponent::BeginPlay()
-{
-	Super::BeginPlay();
-
-}
-
 void UTaskLogComponent::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
-
-	DOREPLIFETIME(UTaskLogComponent, CurrentTasks);
+	
 	DOREPLIFETIME(UTaskLogComponent, CurrentActiveTasks);
+}
+
+void UTaskLogComponent::Client_SpawnTask_Implementation(const FName& TaskID)
+{
+	if (TaskClass == nullptr)
+	{
+		UE_LOG(LogTaskLogComponent, Warning, TEXT("Task Class is null"));
+	}
+	
+	if (ATaskBase* Task = GetWorld()->SpawnActor<ATaskBase>(TaskClass))
+	{
+		Task->SetTaskID(TaskID);
+		Task->SetOwner(GetOwner());
+		CurrentTasks.Add(Task);
+	}
 }
 
 void UTaskLogComponent::AddNewTask(const FName& TaskID)
@@ -37,19 +40,9 @@ void UTaskLogComponent::AddNewTask(const FName& TaskID)
 	{
 		return;
 	}
-
-	if (TaskClass == nullptr)
-	{
-		UE_LOG(LogTaskLogComponent, Warning,TEXT("No Task class is set!"))
-		return;
-	}
 	
 	CurrentActiveTasks.Add(TaskID);
-	if (ATaskBase* Task = GetWorld()->SpawnActor<ATaskBase>(TaskClass))
-	{
-		Task->SetTaskID(TaskID);
-		CurrentTasks.Add(Task);
-	}
+	Client_SpawnTask(TaskID);
 }
 
 void UTaskLogComponent::CompleteTask()
