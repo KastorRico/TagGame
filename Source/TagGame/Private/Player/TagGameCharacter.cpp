@@ -7,11 +7,13 @@
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "InputActionValue.h"
+#include "Components/InventoryComponent.h"
 #include "Components/TagComponent.h"
 #include "TaskSystem/TaskLogComponent.h"
 #include "TaskSystem/InteractionInterface.h"
+#include "Equipment/EquippableActor.h"
 
-DEFINE_LOG_CATEGORY(LogTemplateCharacter);
+DEFINE_LOG_CATEGORY(LogTagCharacter);
 
 //////////////////////////////////////////////////////////////////////////
 // ATagGameCharacter
@@ -27,8 +29,8 @@ ATagGameCharacter::ATagGameCharacter()
 	FollowCamera->SetupAttachment(CameraBoom, USpringArmComponent::SocketName); 
 
 	TagComponent = CreateDefaultSubobject<UTagComponent>(TEXT("TagComponent"));
-
 	TaskLogComponent = CreateDefaultSubobject<UTaskLogComponent>(TEXT("TaskLogComponent"));
+	InventoryComponent = CreateDefaultSubobject<UInventoryComponent>(TEXT("InventoryComponent"));
 }
 
 void ATagGameCharacter::BeginPlay()
@@ -67,11 +69,15 @@ void ATagGameCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 
 		EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &ATagGameCharacter::Look);
 
-		EnhancedInputComponent->BindAction(InteractAction,ETriggerEvent::Started,this,&ATagGameCharacter::Interact);
+		EnhancedInputComponent->BindAction(InteractAction,
+			ETriggerEvent::Started,this,&ATagGameCharacter::Interact);
+		
+		EnhancedInputComponent->BindAction(DropItemAction,
+			ETriggerEvent::Started,this,&ATagGameCharacter::DropActiveItem);
 	}
 	else
 	{
-		UE_LOG(LogTemp, Error, TEXT("Failed to find an Enhanced Input component!"));
+		UE_LOG(LogTagCharacter, Error, TEXT("Failed to find an Enhanced Input component!"));
 	}
 	
 }
@@ -168,16 +174,28 @@ void ATagGameCharacter::Interact()
 	Server_Interact();
 }
 
+void ATagGameCharacter::DropActiveItem()
+{
+	if (InventoryComponent == nullptr)
+	{
+		return;
+	}
+
+	InventoryComponent->Server_DropItem();
+}
+
 void ATagGameCharacter::Server_Interact_Implementation()
 {
 	if (Cast<IInteractionInterface>(LookAtActor))
 	{
-		const FString& ObjectiveId = IInteractionInterface::Execute_Interact(LookAtActor);
-		if (!ObjectiveId.IsEmpty())
+		UE_LOG(LogTagCharacter, Display, TEXT("Interact called %s"),*LookAtActor->GetName());
+		const FString& ObjectiveId = IInteractionInterface::Execute_Interact(LookAtActor,this);
+		if (ObjectiveId.IsEmpty())
 		{
-			Client_BroadcastObjectiveIdCalled(ObjectiveId);	
+			UE_LOG(LogTagCharacter,Warning,TEXT("No Objective ID!"));
+			return;
 		}
-		return;
+		Client_BroadcastObjectiveIdCalled(ObjectiveId);
 	}
 	
 	if (ATagGameCharacter* HitCharacter = Cast<ATagGameCharacter>(LookAtActor))

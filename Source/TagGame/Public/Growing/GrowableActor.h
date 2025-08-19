@@ -7,7 +7,7 @@
 #include "TaskSystem/InteractionInterface.h"
 #include "GrowableActor.generated.h"
 
-UCLASS()
+UCLASS(Abstract)
 class TAGGAME_API AGrowableActor : public AActor, public IInteractionInterface
 {
 	GENERATED_BODY()
@@ -29,7 +29,7 @@ protected:
 
 	virtual void StopLookAt_Implementation() override;
 
-	virtual FString Interact_Implementation() override;
+	virtual FString Interact_Implementation(ATagGameCharacter* Character) override;
 
 	UFUNCTION()
 	void Grow();
@@ -58,4 +58,12 @@ protected:
 	FTimerHandle GrowingTimer;
 	
 	bool bIsReadyToCollect = false;
+
+public:
+
+	FORCEINLINE void SetCurStage(int32 Stage) { CurrStage = Stage; }
+
+	FORCEINLINE UStaticMeshComponent* GetStaticMesh() { return StaticMeshComponent; }
+
+	void PauseGrowingTimer(bool Value);
 };

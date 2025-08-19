@@ -26,10 +26,15 @@ protected:
 
 	virtual void OnPostLogin(AController* NewPlayer) override;
 
+	void ShuffleTasks();
+
 	UPROPERTY(EditDefaultsOnly,meta = (DataTable = "/Game/DT_TaskDetails"))
 	TArray<FDataTableRowHandle> Tasks;
-	
 
+	// number of tasks per player
+	UPROPERTY(EditDefaultsOnly)
+	int32 NumOfTasks = 1;
+	
 };
 
 

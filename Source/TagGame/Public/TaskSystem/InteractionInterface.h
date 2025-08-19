@@ -3,8 +3,11 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Player/TagGameCharacter.h"
 #include "UObject/Interface.h"
 #include "InteractionInterface.generated.h"
+
+class ATagGameCharacter;
 
 UINTERFACE(MinimalAPI, Blueprintable)
 class UInteractionInterface : public UInterface
@@ -22,7 +25,7 @@ class TAGGAME_API IInteractionInterface
 public:
 
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
-	FString Interact();
+	FString Interact(ATagGameCharacter* Character);
 
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
 	void LookAt();

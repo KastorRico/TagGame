@@ -18,7 +18,11 @@ public:
 	UPROPERTY(BlueprintAssignable,Category="Task")
 	FOnProgressChanged OnObjectiveProgressChanged;
 
-	FObjectiveDetails GetObjectiveDetails(const FString& ObjectiveID);
+	UPROPERTY(BlueprintAssignable,Category="Task")
+	FOnProgressChanged OnStageChanged;
+
+	UPROPERTY(BlueprintAssignable,Category="Task")
+	FOnProgressChanged OnTaskCompleted;
 	
 protected:
 	virtual void BeginPlay() override;
@@ -50,9 +54,19 @@ protected:
 public:
 
 	void SetTaskID(const FName& NewTaskID);
+	
+	FObjectiveDetails GetObjectiveDetails(const FString& ObjectiveID);
+
+	bool IsObjectiveCompleted(const FString& ObjectiveID);
 
 	UFUNCTION(BlueprintPure)
 	FORCEINLINE FName GetTaskID() const { return TaskID; }
+
+	UFUNCTION(BlueprintPure)
+	FORCEINLINE bool IsCompleted() const { return bIsCompleted; }
+
+	UFUNCTION(BlueprintPure)
+	FORCEINLINE int32 GetCurrentStage() const {return CurrentStage;}
 };
 
 

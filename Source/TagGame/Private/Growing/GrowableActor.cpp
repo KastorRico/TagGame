@@ -79,7 +79,7 @@ void AGrowableActor::StopLookAt_Implementation()
 	StaticMeshComponent->SetOverlayMaterial(nullptr);
 }
 
-FString AGrowableActor::Interact_Implementation()
+FString AGrowableActor::Interact_Implementation(ATagGameCharacter* Character)
 {
 	if(!bIsReadyToCollect)
 	{
@@ -105,7 +105,18 @@ void AGrowableActor::Grow()
 	}
 
 	StaticMeshComponent->SetStaticMesh(Meshes[CurrStage]);
-	
+}
+
+void AGrowableActor::PauseGrowingTimer(bool Value)
+{
+	if (Value)
+	{
+		GetWorld()->GetTimerManager().PauseTimer(GrowingTimer);
+	}
+	else
+	{
+		GetWorld()->GetTimerManager().UnPauseTimer(GrowingTimer);
+	}
 }
 
 

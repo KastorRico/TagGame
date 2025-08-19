@@ -48,9 +48,12 @@ void ATagGameMode::GiveTasks(ATagGameCharacter* TagCharacter)
 		return;
 	}
 	
-	int32 RandomTaskID = FMath::RandRange(0, Tasks.Num()-1);
-
-	TaskLogComponent->AddNewTask(Tasks[RandomTaskID].RowName);
+	ShuffleTasks();
+	
+	for(int32 i = 0; i < Tasks.Num() && i<NumOfTasks; ++i)
+	{
+		TaskLogComponent->AddNewTask(Tasks[i].RowName);	
+	}
 }
 
 void ATagGameMode::GiveTasksToNewPawn(APawn* OldPawn, APawn* NewPawn)
@@ -71,5 +74,18 @@ void ATagGameMode::OnPostLogin(AController* NewPlayer)
 	Super::OnPostLogin(NewPlayer);
 	
 	NewPlayer->OnPossessedPawnChanged.AddUniqueDynamic(this,&ATagGameMode::GiveTasksToNewPawn);
+}
+
+void ATagGameMode::ShuffleTasks()
+{
+	for(int32 i=0;i<Tasks.Num() && i<NumOfTasks;++i)
+	{
+		int32 Index = FMath::RandRange(i, Tasks.Num()-1);
+
+		if(i != Index)
+		{
+			Tasks.Swap(i,Index);
+		}
+	}
 }
 

@@ -5,6 +5,7 @@
 #include "Logging/LogMacros.h"
 #include "TagGameCharacter.generated.h"
 
+class UInventoryComponent;
 class USpringArmComponent;
 class UCameraComponent;
 class UTagComponent;
@@ -14,7 +15,7 @@ class UInputMappingContext;
 class UInputAction;
 struct FInputActionValue;
 
-DECLARE_LOG_CATEGORY_EXTERN(LogTemplateCharacter, Log, All);
+DECLARE_LOG_CATEGORY_EXTERN(LogTagCharacter, Log, All);
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnObjectiveIdCalled, const FString&);
 
 UCLASS(config=Game)
@@ -39,6 +40,9 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	TObjectPtr<UTaskLogComponent> TaskLogComponent;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	TObjectPtr<UInventoryComponent> InventoryComponent;
+
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input)
 	TObjectPtr<UInputMappingContext> DefaultMappingContext;
@@ -54,6 +58,9 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input)
 	TObjectPtr<UInputAction> InteractAction;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input)
+	TObjectPtr<UInputAction> DropItemAction;
 
 
 	UPROPERTY(EditAnywhere)
@@ -77,6 +84,8 @@ protected:
 	void InteractTrace();
 	void Interact();
 
+	void DropActiveItem();
+
 	UFUNCTION(Server, Unreliable)
 	void Server_Interact();
 
@@ -92,11 +101,9 @@ protected:
 public:
 
 	FORCEINLINE USpringArmComponent* GetCameraBoom() const { return CameraBoom; }
-
 	FORCEINLINE UCameraComponent* GetFollowCamera() const { return FollowCamera; }
-
 	FORCEINLINE UTagComponent* GetTagComponent() const { return TagComponent; }
-
 	FORCEINLINE UTaskLogComponent* GetTaskLogComponent() const { return TaskLogComponent; }
+	FORCEINLINE UInventoryComponent* GetInventoryComponent() const { return InventoryComponent; }
 };
 
