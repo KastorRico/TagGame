@@ -41,15 +41,17 @@ void AGrowingBed::BeginPlay()
 	}
 	
 	StaticMesh->SetCollisionResponseToChannel(ECC_GameTraceChannel1,ECR_Ignore);
-	GrowableActor = GetWorld()->SpawnActorDeferred<AGrowableActor>(GrowableActorClass,
-		GetActorTransform());
-	if(GrowableActor != nullptr)
+	if (HasAuthority())
 	{
-		GrowableActor->SetCurStage(Stage);
-		GrowableActor->FinishSpawning(FTransform(GetActorLocation()));
-		GrowableActor->OnDestroyed.AddDynamic(this,&AGrowingBed::Collect);
+		GrowableActor = GetWorld()->SpawnActorDeferred<AGrowableActor>(GrowableActorClass,
+			GetActorTransform());
+		if(GrowableActor != nullptr)
+		{
+			GrowableActor->SetCurStage(Stage);
+			GrowableActor->FinishSpawning(FTransform(GetActorLocation()));
+			GrowableActor->OnDestroyed.AddDynamic(this,&AGrowingBed::Collect);
+		}
 	}
-	
 }
 
 
@@ -70,7 +72,8 @@ FString AGrowingBed::Interact_Implementation(ATagGameCharacter* Character)
 
 	if(AWateringActor* WateringActor = Cast<AWateringActor>(Inventory->GetActiveItem()))
 	{
-		UnpauseGrowing();
+		WateringActor->OnUsageMontageEnded.AddUObject(this,&AGrowingBed::UnpauseGrowing);
+		WateringActor->PlayMontageAndUse(Character);
 		return "Watered";
 	}
 	if(bIsDry)
@@ -80,7 +83,6 @@ FString AGrowingBed::Interact_Implementation(ATagGameCharacter* Character)
 	
 	if(ASeed* Seed = Cast<ASeed>(Inventory->GetActiveItem()))
 	{
-		UE_LOG(LogGrowingBedActor, Warning, TEXT("USING SEEEEDS"));
 		GrowableActorClass = Seed->GetGrowableActorClass();
 		Seed->Use();
 	}

@@ -7,6 +7,8 @@
 #include "TaskSystem/InteractionInterface.h"
 #include "EquippableActor.generated.h"
 
+DECLARE_MULTICAST_DELEGATE(FOnUsageMontageEnded);
+
 UCLASS()
 class TAGGAME_API AEquippableActor : public AActor, public IInteractionInterface
 {
@@ -15,25 +17,23 @@ class TAGGAME_API AEquippableActor : public AActor, public IInteractionInterface
 public:	
 
 	AEquippableActor();
-
+	
 protected:
-
-	UPROPERTY(BlueprintReadOnly,VisibleAnywhere)
-	TObjectPtr<USceneComponent> Root;
 	
 	UPROPERTY(BlueprintReadOnly,VisibleAnywhere)
 	TObjectPtr<UStaticMeshComponent> StaticMesh;
 	
-	UPROPERTY(EditDefaultsOnly)
+	UPROPERTY(EditDefaultsOnly, Category="Objective")
 	FString EquippableActorId;
 
-	UPROPERTY(EditDefaultsOnly)
+	UPROPERTY(EditDefaultsOnly, Category="EquippableActor")
 	float ThrowForce = 100.f;
 
-	UPROPERTY(VisibleAnywhere)
-	FTransform StartingTransform;
+	UPROPERTY(EditDefaultsOnly, Category="EquippableActor")
+	TObjectPtr<UAnimMontage> UsageAnimMontage;
 
-	virtual void BeginPlay() override;
+	UPROPERTY(EditAnywhere, Category="EquippableActor")
+	FTransform AttachmentTransform;
 
 	virtual void LookAt_Implementation() override;
 
@@ -41,11 +41,20 @@ protected:
 
 	virtual FString Interact_Implementation(ATagGameCharacter* Character) override;
 
+	UFUNCTION()
+	virtual void UseOnMontageEnded(UAnimMontage* Montage, bool bInterrupted);
+
 public:
 
-	FORCEINLINE UStaticMeshComponent* GetStaticMeshComponent() { return StaticMesh; }
+	FOnUsageMontageEnded OnUsageMontageEnded;
 	
 	void Equip(ACharacter* Character, const FName& AttachSocketName);
 
 	void Unequip();
+
+	UFUNCTION(NetMulticast, Unreliable)
+	virtual void PlayMontageAndUse(ACharacter* Player);
+
+	FORCEINLINE UStaticMeshComponent* GetStaticMeshComponent() { return StaticMesh; }
+	
 };

@@ -25,6 +25,7 @@ void UInventoryComponent::OnActiveItemDestroyed(AActor* Actor)
 	ActiveItem = nullptr;
 }
 
+// Sets an Item as an active item if a player already has an active items they will drop it
 void UInventoryComponent::SetActiveItem(TObjectPtr<AEquippableActor> Item)
 {
 	if(Item == nullptr || Item == ActiveItem)

@@ -5,9 +5,6 @@
 #include "Animation/AnimInstance.h"
 #include "TagCharacterAnimInstance.generated.h"
 
-/**
- * 
- */
 UCLASS()
 class TAGGAME_API UTagCharacterAnimInstance : public UAnimInstance
 {

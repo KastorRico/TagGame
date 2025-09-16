@@ -24,7 +24,7 @@ protected:
 	UFUNCTION()
 	void OnActiveItemDestroyed(AActor* Actor);
 
-	UPROPERTY(EditDefaultsOnly)
+	UPROPERTY(EditDefaultsOnly, Category = Inventory)
 	FName ActiveItemSocket;
 
 	UPROPERTY(Replicated, VisibleAnywhere)

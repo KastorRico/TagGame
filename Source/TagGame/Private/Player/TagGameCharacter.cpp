@@ -122,7 +122,7 @@ void ATagGameCharacter::InteractTrace()
 {
 	const FVector Start = GetActorLocation();
 	const FVector End = Start + GetActorForwardVector() * InteractTraceLength;
-	DrawDebugLine(GetWorld(),Start,End,FColor::Red,false,3.f);
+	//DrawDebugLine(GetWorld(),Start,End,FColor::Red,false,3.f);
 	
 	FCollisionQueryParams CollisionQueryParams;
 	CollisionQueryParams.AddIgnoredActor(this);
@@ -186,7 +186,16 @@ void ATagGameCharacter::DropActiveItem()
 
 void ATagGameCharacter::Server_Interact_Implementation()
 {
-	if (Cast<IInteractionInterface>(LookAtActor))
+	check(TagComponent);
+	if (ATagGameCharacter* HitCharacter = Cast<ATagGameCharacter>(LookAtActor))
+	{
+		if (TagComponent != nullptr && TagComponent->IsChaser())
+		{
+			TagComponent->Tag(HitCharacter);
+		}
+	}
+	
+	if (Cast<IInteractionInterface>(LookAtActor) && !TagComponent->IsChaser())
 	{
 		UE_LOG(LogTagCharacter, Display, TEXT("Interact called %s"),*LookAtActor->GetName());
 		const FString& ObjectiveId = IInteractionInterface::Execute_Interact(LookAtActor,this);
@@ -196,14 +205,6 @@ void ATagGameCharacter::Server_Interact_Implementation()
 			return;
 		}
 		Client_BroadcastObjectiveIdCalled(ObjectiveId);
-	}
-	
-	if (ATagGameCharacter* HitCharacter = Cast<ATagGameCharacter>(LookAtActor))
-	{
-		if (TagComponent != nullptr && TagComponent->IsChaser())
-		{
-			TagComponent->Tag(HitCharacter);
-		}
 	}
 }
 

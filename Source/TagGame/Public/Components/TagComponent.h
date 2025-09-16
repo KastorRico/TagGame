@@ -25,7 +25,7 @@ protected:
 public:
 
 	UFUNCTION()
-	void Tag(ATagGameCharacter* TaggedActor);
+	void Tag(const ATagGameCharacter* TaggedActor);
 
 	FORCEINLINE void SetIsChaser(bool Value) { bIsChaser = Value; }
 	FORCEINLINE bool IsChaser() const { return bIsChaser; }

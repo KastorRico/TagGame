@@ -18,7 +18,7 @@ void UTagComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLif
 	DOREPLIFETIME(UTagComponent, bIsChaser);
 }
 
-void UTagComponent::Tag(ATagGameCharacter* TaggedActor)
+void UTagComponent::Tag(const ATagGameCharacter* TaggedActor)
 {
 	if (!bIsChaser)
 	{
@@ -30,12 +30,12 @@ void UTagComponent::Tag(ATagGameCharacter* TaggedActor)
 		UE_LOG(LogTagComponent, Warning, TEXT("Character is trying to tag themselves!"));
 		return;
 	}
-	
 	if (TaggedActor == nullptr)
 	{
 		UE_LOG(LogTagComponent, Warning, TEXT("Character is not valid!"));
 		return;
 	}
+	
 	UTagComponent* TagComponent = TaggedActor->GetTagComponent();
 	if (TagComponent == nullptr)
 	{

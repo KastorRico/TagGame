@@ -11,21 +11,10 @@ AEquippableActor::AEquippableActor()
 	PrimaryActorTick.bCanEverTick = false;
 	
 	StaticMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("StaticMesh"));
-	Root = CreateDefaultSubobject<USceneComponent>(TEXT("Root"));
-	RootComponent = Root;
-	StaticMesh->SetupAttachment(Root);
-	StaticMesh->SetIsReplicated(true);
+	RootComponent = StaticMesh;
 	bReplicates = true;
-	
+	StaticMesh->SetIsReplicated(true);
 	StaticMesh->SetCollisionProfileName(TEXT("Equippable"));
-}
-
-
-void AEquippableActor::BeginPlay()
-{
-	Super::BeginPlay();
-
-	StartingTransform = StaticMesh->GetRelativeTransform();
 }
 
 void AEquippableActor::LookAt_Implementation()
@@ -59,9 +48,9 @@ void AEquippableActor::Equip(ACharacter* Character, const FName& AttachSocketNam
 	}
 	StaticMesh->SetSimulatePhysics(false);
 	StaticMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-	Root->AttachToComponent(Character->GetMesh(),
+	AttachToComponent(Character->GetMesh(),
 	FAttachmentTransformRules::SnapToTargetNotIncludingScale,AttachSocketName);
-	StaticMesh->SetRelativeTransform(StartingTransform);
+	StaticMesh->SetRelativeTransform(AttachmentTransform);
 	SetOwner(Character);
 }
 
@@ -80,6 +69,33 @@ void AEquippableActor::Unequip()
 													   GetActorLocation());
 	}
 	SetOwner(nullptr);
+}
+
+void AEquippableActor::UseOnMontageEnded(UAnimMontage* Montage, bool bInterrupted)
+{
+	if(OnUsageMontageEnded.IsBound())
+	{
+		OnUsageMontageEnded.Broadcast();
+		OnUsageMontageEnded.Clear();
+	}
+}
+
+void AEquippableActor::PlayMontageAndUse_Implementation(ACharacter* Player)
+{
+	if (UsageAnimMontage == nullptr)
+	{
+		return;
+	}
+	if (Player == nullptr)
+	{
+		return;
+	}
+	check(Player->GetMesh() != nullptr)
+	if (UAnimInstance* AnimInstance = Player->GetMesh()->GetAnimInstance())
+	{
+		Player->PlayAnimMontage(UsageAnimMontage);
+		AnimInstance->OnMontageEnded.AddUniqueDynamic(this,&AEquippableActor::UseOnMontageEnded);
+	}
 }
 
 
